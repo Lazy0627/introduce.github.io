@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人主页</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh;
+    background: #f5f5f5;
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    display: flex;
+    justify-content: center;
+  }
+  .app { width: 100%; max-width: 680px; position: relative; }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    padding: 12px 12px;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    border-bottom: 1px solid #e5e5e5;
+  }
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 9px 0;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab.active { background: #9e9e9e; color: #fff; }
+
+  .panel {
+    display: none;
+    position: relative;
+    min-height: calc(100vh - 60px);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+  .panel.active { display: block; }
+  .panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(245, 245, 245, 0.2);
+    z-index: 0;
+  }
+  .panel > * { position: relative; z-index: 1; }
+
+  #panel-home       { background-image: url('Image_1791734235441_420.png'); }
+  #panel-gallery    { background-image: url('Image_1791734235441_420.png'); }
+  #panel-elopement  { background-image: url('Image_1791734235441_420.png'); }
+  #panel-thoughts   { background-image: url('Image_1791734235441_420.png'); }
+
+  /* ========== 个人简介 ========== */
+.cover {
+  width: 100%;
+  height: 240px;
+  background: url('20260722_214356.jpg') center/cover no-repeat;
+  position: relative;
+}
+  .cover::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 70px;
+  background: linear-gradient(to bottom, rgba(245,245,245,0) 0%, rgba(245,245,245,1) 100%);
+  }
+  .avatar-wrap {
+  margin-top: -55px;
+  padding-left: 24px;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  gap: 45px;
+  }
+  .avatar {
+    width: 110px; height: 110px;
+    border-radius: 50%; overflow: hidden;
+    border: 4px solid #ffffff;
+    background: #eeeeee;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .profile { padding: 16px 24px 32px; }
+  .name { font-size: 22px; font-weight: 700; color: #333; }
+  .handle { font-size: 14px; color: #999; margin-top: 4px; }
+
+  /* 合并后的信息卡片 */
+  .info-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 20px;
+    margin-top: 18px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  }
+  .info-card .section {
+    padding: 4px 0;
+  }
+  .info-card .section + .section {
+    border-top: 1px solid #f0f0f0;
+    margin-top: 14px;
+    padding-top: 14px;
+  }
+  .info-card .title {
+    font-size: 14px;
+    color: #666;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .info-card p {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.9;
+  }
+
+  /* ========== 一些家产 ========== */
+  .family-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 20px;
+    margin: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  }
+  .family-card .title {
+    font-size: 14px; color: #666;
+    font-weight: 700; margin-bottom: 8px;
+  }
+  .family-card p { font-size: 14px; color: #555; line-height: 1.9; }
+
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    padding: 8px;
+  }
+  .gallery img {
+    width: 100%; aspect-ratio: 1/1;
+    object-fit: cover; display: block;
+    border-radius: 4px;
+  }
+
+  /* ========== 和我私奔 ========== */
+  .elopement-photo { width: 100%; padding: 16px; }
+  .elopement-photo img {
+    width: 100%; border-radius: 20px; display: block;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+  .mini-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin: 12px 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f0f0f0;
+    font-size: 14px; color: #555; line-height: 1.7;
+  }
+  .mini-card .tag {
+    font-size: 11px; color: #999;
+    letter-spacing: 2px; margin-bottom: 6px;
+  }
+
+  /* ========== 碎碎念 ========== */
+  .thought {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 20px;
+    margin: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    border: 1px solid #f0f0f0;
+  }
+  .thought .label {
+    font-size: 11px; color: #999;
+    letter-spacing: 2px; margin-bottom: 12px;
+  }
+  .thought .bubble-dark {
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .thought .dark-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    overflow: hidden; flex-shrink: 0; background: #eeeeee;
+  }
+  .thought .dark-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .thought .dark-text {
+    max-width: 75%; background: #f0f0f0; color: #444;
+    padding: 12px 16px; border-radius: 16px;
+    font-size: 13px; line-height: 1.7;
+  }
+  .thought .dark-text.blue {
+    background: #ffffff; color: #444;
+    border: 1px solid #f0f0f0;
+  }
+
+  .footer { text-align: center; margin: 24px 0; font-size: 11px; color: #bbb; letter-spacing: 1px; }
+
+  /* ========== 音乐按钮 ========== */
+  .music-btn {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #9e9e9e;
+    color: #fff;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    z-index: 50;
+  }
+  .music-title {
+  position: fixed;
+  right: 80px;
+  bottom: 32px;
+  font-size: 12px;
+  color: #666;
+  background: rgba(255,255,255,0.9);
+  padding: 6px 12px;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  z-index: 49;
+}
+.music-title.show { opacity: 1; }
+  .music-btn.playing { animation: spin 3s linear infinite; }
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  /* 点击特效 */
+#click-effect-layer {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 999;
+}
+.click-heart {
+  position: absolute;
+  font-size: 60px;
+  color: #ff8fab;
+  pointer-events: none;
+  animation: floatUp 1s ease-out forwards;
+}
+@keyframes floatUp {
+  0%   { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+  100% { transform: translate(-50%, -150%) scale(1.2); opacity: 0; }
+}
+</style>
+</head>
+<body>
+  <div id="click-effect-layer"></div>
+  <div class="app">
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('home', this)">个人简介</div>
+      <div class="tab" onclick="switchTab('gallery', this)">一些家产</div>
+      <div class="tab" onclick="switchTab('elopement', this)">和我私奔</div>
+      <div class="tab" onclick="switchTab('thoughts', this)">碎碎念</div>
+    </div>
+
+    <!-- ========== 个人简介 ========== -->
+    <div class="panel active" id="panel-home">
+      <div class="cover"></div>
+      <div class="avatar-wrap">
+  <div class="avatar"><img src="1791711155853.jpg" alt="头像"></div>
+  <div class="profile-meta">
+    <div class="name">Lazy-zhiye ♡</div>
+    <div class="handle">@Lazy-zhiye</div>
+  </div>
+</div>
+<div class="profile">
+
+        <!-- 属性 + 雷点合并成一个卡片 -->
+        <div class="info-card">
+          <div class="section">
+            <div class="title">属性</div>
+            <p>原崩绝 / 1999 / 原创圈 / 韩漫 / 韩腐<br>BL &gt; GL &gt; BG</p>
+          </div>
+          <div class="section">
+            <div class="title">雷点</div>
+            <p>盗笔影视化 / 联动相关 / 黑花 / 龟毛虾 / sdfj二代及以后 / 辱女相关 / 黄腔黄梗荤段子 / inj / 诅咒条 / 无边界感 / 恶臭br. / 贴脸 / 一体机 / dw / mn / wpg</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 一些家产 ========== -->
+    <div class="panel" id="panel-gallery">
+      <div class="family-card">
+        <div class="title">心肝</div>
+        <p>八重神子</p>
+        <div class="title" style="margin-top:14px;">家产</div>
+        <p>瓶邪 / 植时 / happy2 / 书呆子 / unsleep / in a scent / perle / 无根树 / 融冰曲线 / Flashlight / kiss me</p>
+      </div>
+
+    <div class="gallery">
+  <img src="HS9fzGAawAAU50C.jpg" style="object-position: top right;">
+  <img src="IMG_20260402_232023.png" >
+  <img src="1789276679652.jpeg" >
+        <img src="IMG_20261005_182220.jpg">
+        <img src="IMG_20261005_185528.jpg">
+        <img src="retouch_2026081915504117.jpg">
+      </div>
+    </div>
+
+    <!-- ========== 和我私奔 ========== -->
+    <div class="panel" id="panel-elopement">
+      <div class="elopement-photo">
+        <img src="无标题158_已修复_20261006213224.png" alt="和我私奔">
+      </div>
+      <div class="mini-card">
+        <div class="tag">NOTE 01</div>
+        “不撞可以直加妹子们 我很温良。扩列默认互补置顶。”
+      </div>
+      <div class="mini-card">
+        <div class="tag">NOTE 02</div>
+        “我的朋友圈很杂乱什么都发一点 朋友圈刷到就赞 会发补赞条。”
+      </div>
+      <div class="mini-card">
+        <div class="tag">NOTE 03</div>
+        “你问我思念多重，不重的，像一座秋山的落叶。”
+      </div>
+    </div>
+
+    <!-- ========== 碎碎念 ========== -->
+    <div class="panel" id="panel-thoughts">
+      <div class="thought">
+        <div class="label">THOUGHT 01</div>
+        <div class="bubble-dark">
+          <div class="dark-avatar"><img src="1791711155853.jpg"></div>
+          <div class="dark-text">“家产好好吃。我要孝一辈子。。”</div>
+        </div>
+      </div>
+
+      <div class="thought">
+        <div class="label">THOUGHT 02</div>
+        <div class="bubble-dark">
+          <div class="dark-avatar"><img src="1791711155853.jpg"></div>
+          <div class="dark-text blue">“一步一跪一磕头只求家产甜甜蜜蜜一辈子…”</div>
+        </div>
+      </div>
+
+      <div class="thought">
+        <div class="label">THOUGHT 03</div>
+        <div class="bubble-dark">
+          <div class="dark-avatar"><img src="1791711155853.jpg"></div>
+          <div class="dark-text">“一生的温良换来了无数人蹬鼻子上脸。”</div>
+        </div>
+      </div>
+
+      <div class="thought">
+        <div class="label">THOUGHT 04</div>
+        <div class="bubble-dark">
+          <div class="dark-avatar"><img src="1791711155853.jpg"></div>
+          <div class="dark-text blue">“人类为什么不能长一个气泡框出来，我想随时随地从头部飘出来一堆脏话。”</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">借我素淡的世故和明白的愚</div>
+  </div>
+  
+<div class="music-title" id="music-title">Like-BTS</div>
+  <div class="music-btn" id="music-btn" onclick="toggleMusic()">🩶</div>
+  <audio id="bgm" loop>
+    <source src="Like-BTS.mp3" type="audio/mpeg">
+  </audio>
+
+<script>
+  function switchTab(id, el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('panel-' + id).classList.add('active');
+  }
+
+  let musicPlaying = false;
+  function toggleMusic() {
+  const bgm = document.getElementById('bgm');
+  const btn = document.getElementById('music-btn');
+  const title = document.getElementById('music-title');
+  if (musicPlaying) {
+    bgm.pause();
+    btn.classList.remove('playing');
+    title.classList.remove('show');
+  } else {
+    bgm.play();
+    btn.classList.add('playing');
+    title.classList.add('show');
+  }
+  musicPlaying = !musicPlaying;
+  }
+  document.addEventListener('click', function autoPlayOnce() {
+  const bgm = document.getElementById('bgm');
+  const btn = document.getElementById('music-btn');
+  bgm.play().then(() => {
+  musicPlaying = true;
+  btn.classList.add('playing');
+  document.getElementById('music-title').classList.add('show');
+}).catch(() => {});
+  document.removeEventListener('click', autoPlayOnce);
+});
+  document.addEventListener('click', function(e) {
+  for (let i = 0; i < 4; i++) {
+    setTimeout(() => {
+      const heart = document.createElement('div');
+      heart.className = 'click-heart';
+      heart.textContent = '♡';
+      heart.style.left = (e.clientX + (Math.random() - 0.5) * 40) + 'px';
+      heart.style.top = (e.clientY + (Math.random() - 0.5) * 40) + 'px';
+      document.getElementById('click-effect-layer').appendChild(heart);
+      setTimeout(() => heart.remove(), 1000);
+    }, i * 80);
+  }
+});
+  let lastScrollTime = 0;
+document.addEventListener('scroll', function() {
+  const now = Date.now();
+  if (now - lastScrollTime < 200) return;  // 200ms 内只触发一次，防止太频繁
+  lastScrollTime = now;
+
+  for (let i = 0; i < 8; i++) {
+    setTimeout(() => {
+      const heart = document.createElement('div');
+      heart.className = 'click-heart';
+      heart.textContent = '♡';
+      heart.style.left = (Math.random() * window.innerWidth) + 'px';
+      heart.style.top = (Math.random() * window.innerHeight) + 'px';
+      document.getElementById('click-effect-layer').appendChild(heart);
+      setTimeout(() => heart.remove(), 1000);
+    }, i * 80);
+  }
+});
+</script>
+</body>
+</html>
